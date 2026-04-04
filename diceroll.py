@@ -1,6 +1,7 @@
 from dice import Die
 import pygal
 import matplotlib.pyplot as plt
+import numpy as np
 import mplcursors as mpl
 import os
 class DiceGameRoll:
@@ -149,27 +150,46 @@ class DiceGameRoll:
             plt.xlabel("Product", fontsize = 14)
             #plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
             scatter = plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
-       
+            a, b = np.array(self.get_all_possible_products()), np.array(self.get_frequencies(results, "product"))
+            m, c = np.polyfit(a, b, 1)
+
         elif type == "sum":
             plt.xlabel("Sum", fontsize = 14)
             #plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
             scatter = plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
+            a, b = np.array(self.get_all_possible_sums()), np.array(self.get_frequencies(results))
+            #polyfit essentially tries to find the best fitting polynomial (the results are floats)
+            m, c = np.polyfit(a, b, 1)
+        #a represents the possible products / sums array, b represents the frequencies of the product / sum array
+        #m represents slope and c represents where the function starts
+        #plots line of best fit
+        plt.plot(a, m*a + c, color = "black", linestyle = "--", linewidth = 2)
+        #{:.2f} will format to two decimal places
+        #the 0.1 means 7.5% from the left and the 0.9 means 90% from the bottom
+        #transform = plt.gca().transAxes basically tells python to use the transAxes system regardless of data limits(meaning it doesn't change)
+        #otherwise our text would shift based on the range of the axes, making it inconsistent
+        plt.text(0.075, 0.9, "y = "  + "{:.2f}".format(m) + " x" + "{:.2f}".format(c), size = 14, transform=plt.gca().transAxes)
         plt.tick_params(axis = "both", labelsize = 14)
-
         #uses the mplcursors library 
         cursor = mpl.cursor(scatter, hover = True)
         #basically the event is add, so each time you hover over a point, mpl_cursors adds a tooltip
         #the @ symbol is a decorator, which connects the cursor connect event with on_hover function
         @cursor.connect("add")
+        #sel is basically is an object that represents the point you are currently hovering over
         def on_hover(sel):
             if type == "sum":
                 #we store the lists into variables just to make it less time consuming
                 sums = self.get_all_possible_sums()
                 frequencies = self.get_frequencies(results)
                 #creates an annotation to display the x/y values
+                #We use type.title() because the text will be variable based on whether we want product / sum
+                #Frequency is a constant so we don't use a variable
+                #Sel.index basically helps yo uget the actual valeus at the position of the sel object
                 sel.annotation.set_text(f"{type.title()}: {sums[sel.index]} \nFrequency: {frequencies[sel.index]}")
+
             elif type == "product":
                 products = self.get_all_possible_products()
                 frequencies = self.get_frequencies(results, "product")
                 sel.annotation.set_text(f"{type.title()}: {products[sel.index]} \nFrequency: {frequencies[sel.index]}")
+        
         plt.show()
