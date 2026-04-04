@@ -1,6 +1,7 @@
 from dice import Die
 import pygal
 import matplotlib.pyplot as plt
+import mplcursors as mpl
 import os
 class DiceGameRoll:
     """A class that allows you to roll multiple dice and find product / sum"""
@@ -146,9 +147,29 @@ class DiceGameRoll:
         plt.yticks(range(0, max(self.get_frequencies(results)) + 1, step))
         if type == "product":
             plt.xlabel("Product", fontsize = 14)
-            plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
+            #plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
+            scatter = plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
+       
         elif type == "sum":
             plt.xlabel("Sum", fontsize = 14)
-            plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
+            #plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
+            scatter = plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
         plt.tick_params(axis = "both", labelsize = 14)
+
+        #uses the mplcursors library 
+        cursor = mpl.cursor(scatter, hover = True)
+        #basically the event is add, so each time you hover over a point, mpl_cursors adds a tooltip
+        #the @ symbol is a decorator, which connects the cursor connect event with on_hover function
+        @cursor.connect("add")
+        def on_hover(sel):
+            if type == "sum":
+                #we store the lists into variables just to make it less time consuming
+                sums = self.get_all_possible_sums()
+                frequencies = self.get_frequencies(results)
+                #creates an annotation to display the x/y values
+                sel.annotation.set_text(f"{type.title()}: {sums[sel.index]} \nFrequency: {frequencies[sel.index]}")
+            elif type == "product":
+                products = self.get_all_possible_products()
+                frequencies = self.get_frequencies(results, "product")
+                sel.annotation.set_text(f"{type.title()}: {products[sel.index]} \nFrequency: {frequencies[sel.index]}")
         plt.show()

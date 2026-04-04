@@ -1,7 +1,8 @@
 import pygal
 from dice import Die
 from diceroll import DiceGameRoll
-sides = int(input("How many sides do you want your first dice to have? "))
+side = int(input("How many sides do you want your first dice to have? "))
+side_two = int(input("How many sides do you want your second dice to have? "))
 die_1 = Die()
 result = die_1.roll_dice(1000)
 frequencies = die_1.get_frequencies(result)
@@ -9,8 +10,8 @@ frequencies = die_1.get_frequencies(result)
 die_1.create_histogram(result)
 
 #more examples 
-die_2 = Die(sides)
-die_3 = Die(10)
+die_2 = Die(side)
+die_3 = Die(side_two)
 #the two dices are passed in because the parameter requires a list
 game = DiceGameRoll([die_2, die_3])
 rolls = game.roll_all(50)
