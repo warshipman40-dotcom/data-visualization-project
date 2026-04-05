@@ -26,9 +26,7 @@ possible_products = game.get_all_possible_products()
 
 possible_sums = game.get_all_possible_sums()
 print("Possible sums: \n" + str(possible_sums))
-#hello
 roll_frequencies = game.get_frequencies(rolls, "sum")
-
 game.visualize_histogram_data(rolls)
 game.visualize_histogram_data(rolls, "dice_products.svg", "product")
 game.visualize_scatter_data(rolls)

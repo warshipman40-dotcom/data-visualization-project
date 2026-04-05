@@ -1,4 +1,5 @@
 from dice import Die
+from collections import Counter
 from sklearn.metrics import r2_score
 import pygal
 from scipy import stats
@@ -110,22 +111,40 @@ class DiceGameRoll:
 
     def get_key_features(self, results, type = "sum", percentile = 50):
         """Finds key features of a dataset"""
+        #this creates a dictionary where the name of the key feature and the value of the key feature can be stored
         key_features = {}
+        #this variable stores the list of sums from results
         total_sum = self.get_sum(results)
+        #this variable stores the list of products from results
         total_products = self.get_product(results)
+        #this variable stores all possible sums you can get
         sum_values = self.get_all_possible_sums()
+        #this variable stores all possible products you can get
         product_values = self.get_all_possible_products()
+        #this variable stores frequencies for each value of sums
         sum_frequencies = self.get_frequencies(results)
+        #this variable stores frequencies for each value of products
         product_frequencies = self.get_frequencies(results, "product")
         #uses a dictionary to store values
         if type == "sum":
+            #this will find the average of the total sums list
             key_features["average"] = np.mean(total_sum)
+            #this will find the median of the total sums list
             key_features["median"] = np.median(total_sum)
-            #this line finds the largest frequency and the index of it
-            max_index = sum_frequencies.index(max(sum_frequencies))
+            #counter method will essentially build a {value : frequency} dictionary for you
+            #example of counter -> counter = {4 : 3, 5 : 2, 1 : 3}
+            counter = Counter(total_sum)
+            #max_freq will store the frequency of the most common value
+            max_freq = max(counter.values())
+            #since counter is basically a dictionary, .items() turns it into a tuple (key, value)
+            #for val, freq unpacks the tuple, stores key -> value, value -> freq
+            #freq == max_freq acts a filter ; it only keeps the values whose frequency is equal to the max frequency
+            #the first val will determine what goes in the list modes while the second one is part of (val, freq) in the tuple unpacking
+            modes = [val for val, freq in counter.items() if freq == max_freq]
+            #mode is the most frequent outcome
             key_features["mode"] = {
-                "value" : sum_values[max_index],
-                "frequency" : sum_frequencies[max_index]
+                "value" : modes,
+                "frequency" : max_freq
             }
             #standard deviance describes how close the values are to the mean
             key_features["standard_deviation"] = np.std(total_sum)
@@ -134,12 +153,16 @@ class DiceGameRoll:
             key_features["percentile"] = np.percentile(total_sum, percentile)
         
         elif type == "product":
+            #key_features["max"] = max(total_products)
+            #key_features["min"] = min(total_products)
             key_features["average"] = np.mean(total_products)
             key_features["median"] = np.median(total_products)
-            max_index = product_frequencies.index(max(product_frequencies))
+            counter = Counter(total_products)
+            max_freq = max(counter.values())
+            modes = [val for val, freq in counter.items() if freq == max_freq]
             key_features["mode"] = {
-                "value" : product_values[max_index],
-                "frequency" : sum_frequencies[max_index]
+                "value" : modes,
+                "frequency" : max_freq
             }
             key_features["standard_deviation"] = np.std(total_products)
             key_features["variance"] = np.var(total_products)
@@ -182,21 +205,50 @@ class DiceGameRoll:
         step = max(1, max(self.get_frequencies(results)) // 10)
         #plt.yticks put ticks from 0 all the way to the maximum value in frequency, moving up by the value of step each time
         plt.yticks(range(0, max(self.get_frequencies(results)) + 1, step))
+        
         if type == "product":
-            plt.xlabel("Product", fontsize = 14)
             x, y = self.get_all_possible_products(), self.get_frequencies(results, "product")
+            plt.xlabel("Product", fontsize = 14)
             scatter = plt.scatter(x, y)
+
+            key_product_features = self.get_key_features(results, "product")
+            mode_value = key_product_features["mode"]["value"]
+            mode_freq = key_product_features["mode"]["frequency"]
+            #stores the value in a variable
+            plt.scatter(mode_value, mode_freq, color="red")
+            #median_value represents the x_value of the median
+            
+            median_value = key_product_features["median"]
+            #plots green dotted line at median_value
+            plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice products = {median_value}")
+            plt.legend()
             #creates a polynomial model
             my_model = np.poly1d(np.polyfit(x, y, 3))
             #specifys where the line will display (where we start, where we end, and the highest point)
             myline = np.linspace(min(x), max(x), max(y))
             plt.plot(myline, my_model(myline))
             relationship = round(r2_score(y, my_model(x)), 3)
+
         elif type == "sum":
-            plt.xlabel("Sum", fontsize = 14)
-            #plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
             x, y = self.get_all_possible_sums(), self.get_frequencies(results)
+            plt.xlabel("Sum", fontsize = 14)
+            #creates a scatter plot of our graph
             scatter = plt.scatter(x, y)
+            #gets the key features dictionaries and stores them in these variables
+            key_sum_features = self.get_key_features(results)
+            #extracts mode value (sum that was rolled most frequently and stores into this variable)
+            mode_value = key_sum_features["mode"]["value"]
+            #extracts mode frequency (the number of times the mode value was rolled and stores into this variable)
+            mode_freq = key_sum_features["mode"]["frequency"]
+            #using the mode value (x-value) and mode_freq (y-value) plots in the color red
+            #mode_value is a list that contains values inside of it (to plot multiple modes)
+            for val in mode_value:
+                plt.scatter(val, mode_freq, color="red")
+
+            median_value = key_sum_features["median"]
+            #this plots a green dotted line at the median value
+            plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice sums = {median_value}")
+            plt.legend()
             #passes in our x and y values and creates a 3rd degree polynomial
             my_model = np.poly1d(np.polyfit(x, y, 3))
             myline = np.linspace(min(x), max(x), max(y))
@@ -205,6 +257,7 @@ class DiceGameRoll:
             #r2_score is a method we import
             #we pass in actual data (y) and model predictions (my_model(x)) to calculate the r2 score
             relationship = round(r2_score(y, my_model(x)), 3)
+       
         #{:.2f} will format to two decimal places
         #the 0.1 means 7.5% from the left and the 0.9 means 90% from the bottom
         #transform = plt.gca().transAxes basically tells python to use the transAxes system regardless of data limits(meaning it doesn't change)
