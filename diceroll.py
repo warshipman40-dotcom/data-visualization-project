@@ -195,7 +195,7 @@ class DiceGameRoll:
                 sel.annotation.set_text(f"{type.title()}: {products[sel.index]} \nFrequency: {frequencies[sel.index]}")
         plt.grid(color = "grey", linestyle = "--", linewidth = 0.5)
         plt.show()
-
+    
     def compare_scatter_data(self, results):
         plt.suptitle(f"Product vs Sum of rolling {self.sides_text} sided die {self.total_rolls} times!")
         #we need to get the lists of all possible products / sums and frequencies
@@ -204,16 +204,28 @@ class DiceGameRoll:
         sums = np.array(self.get_all_possible_sums())
         product_frequencies = np.array(self.get_frequencies(results, "product"))
         sum_frequencies = np.array(self.get_frequencies(results))
-         #step basically divides the ticks into 10 sections and ensures it is > 1
-        step = max(1, max(sum_frequencies) // 10)
-        #plt.yticks put ticks from 0 all the way to the maximum value in frequency, moving up by the value of step each time
-        plt.yticks(range(0, max(sum_frequencies) + 1, step))
         #this plot has 1 row, 2 columns, and this subplot is the first plot
         plt.subplot(1, 2, 1)
         plt.title("Sums")
-        plt.plot(sums, sum_frequencies)
+        #returns a scatter object which contains all plotted points and positions
+        scatter_sum = plt.scatter(sums, sum_frequencies)
+        #checks for mouse interactions (tooltips appear when you hover)
+        cursor = mpl.cursor(scatter_sum, hover = True)
+        #@ is decorater (connects function with event)
+        #When a new annotation (tooltip) is shown, the function is run
+        @cursor.connect("add")
+        #sel is an object created by mpl.cursor that basically represents the point we currently hover over
+        #sel is a container of information including index
+        #sel.index is basically a point (x, y)
+        def on_hover_sum(sel):
+            sel.annotation.set_text(f"Sum: {sums[sel.index]} \nFrequency: {sum_frequencies[sel.index]}")
+
         #this plot has 1 row, 2 columns, and this subplot is the second plot
         plt.subplot(1, 2, 2)
         plt.title("Products")
-        plt.plot(products, product_frequencies)
-        plt.show()
+        scatter_product = plt.scatter(products, product_frequencies, c="red")
+        cursor_two = mpl.cursor(scatter_product, hover = True)
+        @cursor_two.connect("add")
+        def on_hover_product(sel):
+            sel.annotation.set_text(f"Product: {sums[sel.index]} \nFrequency : {product_frequencies[sel.index]}")
+        plt.show()  
