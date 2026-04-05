@@ -15,6 +15,7 @@ class Die():
     def roll_dice(self, num_rolls):
         self.num_rolls = num_rolls
         """Rolls a random number of rolls"""
+        #results will store every roll that occurs
         results = []
         #this line will roll the dice a certain number of rolls
         for roll in range(num_rolls):

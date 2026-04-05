@@ -1,5 +1,7 @@
 from dice import Die
+from sklearn.metrics import r2_score
 import pygal
+from scipy import stats
 import matplotlib.pyplot as plt
 import numpy as np
 import mplcursors as mpl
@@ -106,13 +108,45 @@ class DiceGameRoll:
         #returns frequencies so we can use it 
         return frequencies
 
-    #def get_key_features(self, results, type = "sum"):
-        #key_features = {}
-        #if type == "sum":
-            #average = 
-        #elif type == "product":
-
-
+    def get_key_features(self, results, type = "sum", percentile = 50):
+        """Finds key features of a dataset"""
+        key_features = {}
+        total_sum = self.get_sum(results)
+        total_products = self.get_product(results)
+        sum_values = self.get_all_possible_sums()
+        product_values = self.get_all_possible_products()
+        sum_frequencies = self.get_frequencies(results)
+        product_frequencies = self.get_frequencies(results, "product")
+        #uses a dictionary to store values
+        if type == "sum":
+            key_features["average"] = np.mean(total_sum)
+            key_features["median"] = np.median(total_sum)
+            #this line finds the largest frequency and the index of it
+            max_index = sum_frequencies.index(max(sum_frequencies))
+            key_features["mode"] = {
+                "value" : sum_values[max_index],
+                "frequency" : sum_frequencies[max_index]
+            }
+            #standard deviance describes how close the values are to the mean
+            key_features["standard_deviation"] = np.std(total_sum)
+            #standard deviance is the square root of variance
+            key_features["variance"] = np.var(total_sum)
+            key_features["percentile"] = np.percentile(total_sum, percentile)
+        
+        elif type == "product":
+            key_features["average"] = np.mean(total_products)
+            key_features["median"] = np.median(total_products)
+            max_index = product_frequencies.index(max(product_frequencies))
+            key_features["mode"] = {
+                "value" : product_values[max_index],
+                "frequency" : sum_frequencies[max_index]
+            }
+            key_features["standard_deviation"] = np.std(total_products)
+            key_features["variance"] = np.var(total_products)
+            key_features["percentile"] = np.percentile(total_products, percentile)
+        print(f"Returning key features of total {type.title()}'s")
+        return key_features
+    
     def visualize_histogram_data(self, results, filename = r"C:\Users\warsh\Downloads\python_work\Data Visualization\sumOfDice.svg", type = "sum", ):
         """Visualizes either the sum or product in a histogram"""
         #list comprehension
@@ -150,29 +184,35 @@ class DiceGameRoll:
         plt.yticks(range(0, max(self.get_frequencies(results)) + 1, step))
         if type == "product":
             plt.xlabel("Product", fontsize = 14)
-            #plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
-            scatter = plt.scatter(self.get_all_possible_products(), self.get_frequencies(results, "product"))
-            a, b = np.array(self.get_all_possible_products()), np.array(self.get_frequencies(results, "product"))
-            m, c = np.polyfit(a, b, 1)
-
+            x, y = self.get_all_possible_products(), self.get_frequencies(results, "product")
+            scatter = plt.scatter(x, y)
+            #creates a polynomial model
+            my_model = np.poly1d(np.polyfit(x, y, 3))
+            #specifys where the line will display (where we start, where we end, and the highest point)
+            myline = np.linspace(min(x), max(x), max(y))
+            plt.plot(myline, my_model(myline))
+            relationship = round(r2_score(y, my_model(x)), 3)
         elif type == "sum":
             plt.xlabel("Sum", fontsize = 14)
             #plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
-            scatter = plt.scatter(self.get_all_possible_sums(), self.get_frequencies(results))
-            a, b = np.array(self.get_all_possible_sums()), np.array(self.get_frequencies(results))
-            #polyfit essentially tries to find the best fitting polynomial (the results are floats)
-            m, c = np.polyfit(a, b, 1)
-        #a represents the possible products / sums array, b represents the frequencies of the product / sum array
-        #m represents slope and c represents where the function starts
-        #plots line of best fit
-        plt.plot(a, m*a + c, color = "black", linestyle = "--", linewidth = 2)
+            x, y = self.get_all_possible_sums(), self.get_frequencies(results)
+            scatter = plt.scatter(x, y)
+            #passes in our x and y values and creates a 3rd degree polynomial
+            my_model = np.poly1d(np.polyfit(x, y, 3))
+            myline = np.linspace(min(x), max(x), max(y))
+            plt.plot(myline, my_model(myline))
+            #a relationship of 1 means a very good fit / 0.0 means the mean / less than 0.0 is a very bad fit
+            #r2_score is a method we import
+            #we pass in actual data (y) and model predictions (my_model(x)) to calculate the r2 score
+            relationship = round(r2_score(y, my_model(x)), 3)
         #{:.2f} will format to two decimal places
         #the 0.1 means 7.5% from the left and the 0.9 means 90% from the bottom
         #transform = plt.gca().transAxes basically tells python to use the transAxes system regardless of data limits(meaning it doesn't change)
         #otherwise our text would shift based on the range of the axes, making it inconsistent
-        plt.text(0.075, 0.9, "y = "  + "{:.2f}".format(m) + " x" + " + {:.2f}".format(c), size = 14, transform=plt.gca().transAxes)
+        #plt.text(0.075, 0.9, "y = "  + "{:.2f}".format(slope) + "x" + " + {:.2f}".format(intercept), size = 12, transform=plt.gca().transAxes)
+        plt.text(0.6, 0.8, f"Relationship = {relationship} \n0 = NR \n|1| = 100% R", size = 12, transform = plt.gca().transAxes)
         plt.tick_params(axis = "both", labelsize = 14)
-        #uses the mplcursors library 
+        #uses the mplcursors library
         cursor = mpl.cursor(scatter, hover = True)
         #basically the event is add, so each time you hover over a point, mpl_cursors adds a tooltip
         #the @ symbol is a decorator, which connects the cursor connect event with on_hover function
@@ -186,7 +226,7 @@ class DiceGameRoll:
                 #creates an annotation to display the x/y values
                 #We use type.title() because the text will be variable based on whether we want product / sum
                 #Frequency is a constant so we don't use a variable
-                #Sel.index basically helps you get the actual valeus at the position of the sel object
+                #Sel.index basically helps you get the actual values at the position of the sel object
                 sel.annotation.set_text(f"{type.title()}: {sums[sel.index]} \nFrequency: {frequencies[sel.index]}")
 
             elif type == "product":
@@ -194,6 +234,7 @@ class DiceGameRoll:
                 frequencies = self.get_frequencies(results, "product")
                 sel.annotation.set_text(f"{type.title()}: {products[sel.index]} \nFrequency: {frequencies[sel.index]}")
         plt.grid(color = "grey", linestyle = "--", linewidth = 0.5)
+        #this should store the relationship data in a file for analysis
         plt.show()
     
     def compare_scatter_data(self, results):
@@ -210,10 +251,10 @@ class DiceGameRoll:
         #returns a scatter object which contains all plotted points and positions
         scatter_sum = plt.scatter(sums, sum_frequencies)
         #checks for mouse interactions (tooltips appear when you hover)
-        cursor = mpl.cursor(scatter_sum, hover = True)
+        cursor_sum = mpl.cursor(scatter_sum, hover = True)
         #@ is decorater (connects function with event)
         #When a new annotation (tooltip) is shown, the function is run
-        @cursor.connect("add")
+        @cursor_sum.connect("add")
         #sel is an object created by mpl.cursor that basically represents the point we currently hover over
         #sel is a container of information including index
         #sel.index is basically a point (x, y)
@@ -224,8 +265,8 @@ class DiceGameRoll:
         plt.subplot(1, 2, 2)
         plt.title("Products")
         scatter_product = plt.scatter(products, product_frequencies, c="red")
-        cursor_two = mpl.cursor(scatter_product, hover = True)
-        @cursor_two.connect("add")
+        cursor_product = mpl.cursor(scatter_product, hover = True)
+        @cursor_product.connect("add")
         def on_hover_product(sel):
-            sel.annotation.set_text(f"Product: {sums[sel.index]} \nFrequency : {product_frequencies[sel.index]}")
+            sel.annotation.set_text(f"Product: {products[sel.index]} \nFrequency : {product_frequencies[sel.index]}")
         plt.show()  
