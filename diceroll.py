@@ -10,7 +10,8 @@ class DiceGameRoll:
         #stores a list of dice
         self.dice = dice
         
-    #this method of DiceGameRoll will pass in a list of die 
+    #this method of DiceGameRoll will pass in a list of die
+    #if let blank, will roll 100 times by default  
     def roll_all(self, total_rolls = 100):
         self.total_rolls = total_rolls
         """This lets you combine dice with different sides"""
@@ -118,10 +119,10 @@ class DiceGameRoll:
         #for each die in the list of dice, the number of sides is stored as a string in sides
         sides = [str(die.num_sides) for die in self.dice]
         #these sides are then joined and stored in sides_text
-        sides_text = ", ".join(sides)
+        self.sides_text = ", ".join(sides)
         hist = pygal.Bar()
         #uses f-strings so that variables can be inserted into the title
-        hist.title = f"{type.title()} of rolling {self.total_rolls} times! ({sides_text} sided dice)"
+        hist.title = f"{type.title()} of rolling {self.total_rolls} times! ({self.sides_text} sided dice)"
         hist.x_title = "Results"
         hist.y_title = "Frequencies"
         #we use an if / else to determine if we are labelling with products or sum
@@ -139,9 +140,10 @@ class DiceGameRoll:
     def visualize_scatter_data(self, results, type = "sum"):
         """Visualizes either the sum or product in a scatter plot"""
         sides = [str(die.num_sides) for die in self.dice]
-        sides_text = ", ".join(sides)
-        plt.title(f"Frequency Analysis of rolling {self.total_rolls} times! ({sides_text} sided dice)")
-        plt.ylabel(f"Frequency of {type.title()}", fontsize = 24)
+        #the self in self.sides_text allows it to be stored in memory and used in different methods
+        self.sides_text = ", ".join(sides)
+        plt.title(f"Frequency Analysis of rolling {self.total_rolls} times! ({self.sides_text} sided dice)")
+        plt.ylabel(f"Frequency of {type.title()}", fontsize = 18)
         #step basically divides the ticks into 10 sections and ensures it is > 1
         step = max(1, max(self.get_frequencies(results)) // 10)
         #plt.yticks put ticks from 0 all the way to the maximum value in frequency, moving up by the value of step each time
@@ -168,7 +170,7 @@ class DiceGameRoll:
         #the 0.1 means 7.5% from the left and the 0.9 means 90% from the bottom
         #transform = plt.gca().transAxes basically tells python to use the transAxes system regardless of data limits(meaning it doesn't change)
         #otherwise our text would shift based on the range of the axes, making it inconsistent
-        plt.text(0.075, 0.9, "y = "  + "{:.2f}".format(m) + " x" + "{:.2f}".format(c), size = 14, transform=plt.gca().transAxes)
+        plt.text(0.075, 0.9, "y = "  + "{:.2f}".format(m) + " x" + " + {:.2f}".format(c), size = 14, transform=plt.gca().transAxes)
         plt.tick_params(axis = "both", labelsize = 14)
         #uses the mplcursors library 
         cursor = mpl.cursor(scatter, hover = True)
@@ -184,12 +186,34 @@ class DiceGameRoll:
                 #creates an annotation to display the x/y values
                 #We use type.title() because the text will be variable based on whether we want product / sum
                 #Frequency is a constant so we don't use a variable
-                #Sel.index basically helps yo uget the actual valeus at the position of the sel object
+                #Sel.index basically helps you get the actual valeus at the position of the sel object
                 sel.annotation.set_text(f"{type.title()}: {sums[sel.index]} \nFrequency: {frequencies[sel.index]}")
 
             elif type == "product":
                 products = self.get_all_possible_products()
                 frequencies = self.get_frequencies(results, "product")
                 sel.annotation.set_text(f"{type.title()}: {products[sel.index]} \nFrequency: {frequencies[sel.index]}")
-        
+        plt.grid(color = "grey", linestyle = "--", linewidth = 0.5)
+        plt.show()
+
+    def compare_scatter_data(self, results):
+        plt.suptitle(f"Product vs Sum of rolling {self.sides_text} sided die {self.total_rolls} times!")
+        #we need to get the lists of all possible products / sums and frequencies
+        #np.array() basically converts these lists to numPy arrays, allowing us to do lienar algebra and graph a line of best fit
+        products = np.array(self.get_all_possible_products())
+        sums = np.array(self.get_all_possible_sums())
+        product_frequencies = np.array(self.get_frequencies(results, "product"))
+        sum_frequencies = np.array(self.get_frequencies(results))
+         #step basically divides the ticks into 10 sections and ensures it is > 1
+        step = max(1, max(sum_frequencies) // 10)
+        #plt.yticks put ticks from 0 all the way to the maximum value in frequency, moving up by the value of step each time
+        plt.yticks(range(0, max(sum_frequencies) + 1, step))
+        #this plot has 1 row, 2 columns, and this subplot is the first plot
+        plt.subplot(1, 2, 1)
+        plt.title("Sums")
+        plt.plot(sums, sum_frequencies)
+        #this plot has 1 row, 2 columns, and this subplot is the second plot
+        plt.subplot(1, 2, 2)
+        plt.title("Products")
+        plt.plot(products, product_frequencies)
         plt.show()
