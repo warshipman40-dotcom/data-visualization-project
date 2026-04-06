@@ -193,7 +193,7 @@ class DiceGameRoll:
         hist.render_to_file(filename)
         #this uses os module to automatically open this file
         os.startfile(filename)
-        
+
     #default percentile
     def visualize_scatter_data(self, results, type = "sum", percentile = 25):
         """Visualizes either the sum or product in a scatter plot"""
@@ -323,6 +323,7 @@ class DiceGameRoll:
                 #defines the valid filetypes
                 filetypes = [("PNG Files", "*.png" ), ("SVG Files", "*.svg"), ("PDF Files", "*.pdf")]
             )
+            messagebox.showinfo("Notification", "Scatter plot successfully saved!")
         else:
             messagebox.showwarning("Notifcation", "Scatter plot not saved")
         #destroys the widget (root)
@@ -421,7 +422,7 @@ class DiceGameRoll:
         def prompt_user():
              #creates a messagebox
              #parent = root ensures that messagebox always appears on top of root
-            confirmation = messagebox.askyesno("Confirmation", f"Delete {filename}?", parent = root)
+            confirmation = messagebox.askyesnocancel("Confirmation", f"Delete {filename}?", parent = root)
             #confirmation_label.pack()
             #confirmation_entry.pack()
             #confirmation_entry.focus()
@@ -441,6 +442,14 @@ class DiceGameRoll:
         #uses toplevel because in the main theres already a tk.Tk()
         #toplevel is linked to the existing root in the main class
         root = tk.Tk()
+        #registers a callback function on root event ("WM_DELETE_WINDOW")
+        #callback function on_close
+        def on_close():
+            messagebox.showinfo("Success", "Succesfully saved data!")
+            #closes root after succesfully showing message
+            root.destroy()
+        #protocol runs 
+        root.protocol("WM_DELETE_WINDOW", on_close)
         #this then forces the window to stay above all other windows on computer
         root.attributes("-topmost", True)
         #this gives the window time to go to the top, and then resets after
@@ -472,7 +481,6 @@ class DiceGameRoll:
         cancel.pack(side = "right", padx = 40)
         #starts an infinite loop for the window/widget object (root) and waits for an event
         root.mainloop()
-        
 
             
 

@@ -1,9 +1,44 @@
 import pygal
 from dice import Die
 from diceroll import DiceGameRoll
+import tkinter as tk
+from tkinter import messagebox
 
-side = int(input("How many sides do you want your first dice to have? "))
-side_two = int(input("How many sides do you want your second dice to have? "))
+root = tk.Tk()
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+scaled_widget_height = int(screen_height/4)
+scaled_widget_width = int(screen_width/4)
+screen_middle_width = int(screen_width / 2)
+screen_middle_height = int(screen_height / 2)
+screen_middle_width = (screen_width - scaled_widget_width) // 2
+screen_middle_height = (screen_height - scaled_widget_height) // 2
+#resizes the root to an appropriate size
+root.geometry(f"{scaled_widget_width}x{scaled_widget_height}+{screen_middle_width}+{screen_middle_height}")
+
+
+tk.Label(root, text = "Dice One Sides").grid(row = 0)
+tk.Label(root, text = "Dice Two Sides").grid(row = 1)
+entryOne = tk.Entry(root)
+entryTwo = tk.Entry(root)
+entryOne.grid(row = 0 , column = 1)
+entryTwo.grid(row = 1, column = 1)
+dice_values = []
+def get_values():
+    #entry.get() returns a string so it must be converted to int
+    global dice_values
+    try:
+        sideOne = int(entryOne.get())
+        sideTwo = int(entryTwo.get())
+        dice_values = [sideOne, sideTwo]
+        root.destroy()
+        return dice_values
+    except ValueError:
+        messagebox.showwarning("Value Error", "Please input two integers")
+
+tk.Button(root, text = "SUBMIT", command = get_values).grid(row = 2, column = 0, columnspan = 2)
+root.mainloop()
+
 die_1 = Die(6)
 result = die_1.roll_dice(100)
 frequencies = die_1.get_frequencies(result)
@@ -11,8 +46,8 @@ frequencies = die_1.get_frequencies(result)
 die_1.create_histogram(result)
 die_1.visualize_scatter(result)
 #more examples 
-die_2 = Die(6)
-die_3 = Die(6)
+die_2 = Die(dice_values[0])
+die_3 = Die(dice_values[1])
 #the two dices are passed in because the parameter requires a list
 game = DiceGameRoll([die_2, die_3])
 rolls = game.roll_all(50)

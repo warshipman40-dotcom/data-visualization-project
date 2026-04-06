@@ -2,6 +2,8 @@ from random import randint
 import pygal
 import matplotlib.pyplot as plt
 import mplcursors as mpl
+import tkinter as tk
+from tkinter import Tk
 from tkinter import messagebox
 from tkinter import filedialog
 from pathlib import Path
@@ -85,5 +87,27 @@ class Die():
         self.cursor(expected_scatter_distribution, expected_scatter_distribution_x, expected_scatter_distribution_y)
         plt.legend()
         plt.show()
+        self.save_scatter_file()
 
-            
+    def save_scatter_file(self):
+        """Automatically give the option to save a scatter file"""
+        root = tk.Tk()
+        #prevent the blank root from appearing
+        root.withdraw()
+        save_scatter = messagebox.askyesno("Save", "Save single die scatter plot?")
+        #default in case of cancel
+        save_path = None
+        if save_scatter:
+            save_path = filedialog.asksaveasfilename(
+                parent = root,
+                initialdir = Path.home() / "Desktop",
+                initialfile = "single_dice_scatterplot.png",
+                title = "Save plot as",
+                defaultextension = ".png",
+                filetypes = [("PNG Files", "*.png"), ("SVG Files", "*.svg"), ("PDF Files", "*.pdf")]
+            )
+        else:
+            messagebox.showwarning("Notification", "Single dice scatter plot not saved")
+        #destroys widget
+        root.destroy()
+        return save_path
