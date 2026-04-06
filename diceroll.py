@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import mplcursors as mpl
 import os
 class DiceGameRoll:
@@ -379,36 +380,46 @@ class DiceGameRoll:
                 #this is because our data gets wiped each time when we use write
                 json.dump(existing_data, file, indent = 3)
         print(f"Data succesfully saved to {filename}!")
-        os.startfile(filename)
 
     def clear_file_data(self, filename = "dice_results.json", confirmation = True):
         """Clears all data from the file"""
-
         #function gets called when the cancel button is clicked
         def cancel_action():
-            print("Operation cancelled")
+            messagebox.showinfo("Operation Cancelled", "File deletion cancelled", parent = mw)
             mw.destroy()
         #function is called when confirmation button is clicked
         def prompt_user():
-            confirmation_label.pack()
-            confirmation_entry.pack()
-            confirmation_entry.focus()
+             #creates a messagebox
+             #parent = mw ensures that messagebox always appears on top of mw
+            confirmation = messagebox.askyesno("Confirmation", f"Delete {filename}?", parent = mw)
+            #confirmation_label.pack()
+            #confirmation_entry.pack()
+            #confirmation_entry.focus()
             if confirmation:
             #asks a second confirmation to make 100% sure the user wants to wipe their data
-                second_confirmation = "no"
-                #second_confirmation = input(f"Are you 100% sure you want to wipe all your data from {filename} (answer in yes/no)")
-                if second_confirmation.lower() == "yes":
+                second_confirmation = messagebox.askyesno("Confirm Again", "Confirm Again", parent = mw)
+                #message.box() returns a boolean 
+                if second_confirmation:
                 #since writing to a file automatically clears the file, we use pass to just clear the file without writing
                     with open(filename, "w") as file:
                         pass
-                    print("File succesfully cleared")
+                    messagebox.showinfo("Success", "File Succesfully Cleared!")
                     mw.destroy()
+                    os.startfile(filename)
         
         #creates the widget object and stores in mw
-        mw = tk.Tk()
-        var = tk.StringVar(value = "yes")
-        confirmation_entry = ttk.Entry(mw, textvariable = var, width=50, font=("Arial", 12))
-        confirmation_label = ttk.Label(mw, text = f"Clear Data \n(Yes / No)")
+        #uses toplevel because in the main theres already a tk.Tk()
+        #toplevel is linked to the existing root in the main class
+        mw = tk.Toplevel()
+        #this moves window to the top of the stacking order
+        mw.lift()
+        #this then forces the window to stay above all other windows on computer
+        mw.attributes("-topmost", True)
+        #this gives the window time to go to the top, and then resets after
+        mw.after(0, lambda: mw.attributes("-topmost", False))
+        #var = tk.StringVar(value = "yes")
+        #confirmation_entry = ttk.Entry(mw, textvariable = var, width=50, font=("Arial", 12))
+        #confirmation_label = ttk.Label(mw, text = f"Clear Data \n(Yes / No)")
         #these functions get the width and height of a device screen
         screen_width = mw.winfo_screenwidth()
         screen_height = mw.winfo_screenheight()
