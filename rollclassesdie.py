@@ -1,45 +1,15 @@
 import pygal
 from dice import Die
 from diceroll import DiceGameRoll
-from tkinter import Entry
-import tkinter as tk
-from tkinter import ttk
 
-#create an entry object, and a root window
-mw = tk.Tk()
-mw.title("Dice sides input")
-diceOneLabel = ttk.Label(mw, text = "Dice One Sides:")
-diceOneLabel.pack(pady = 2)
-diceOneSides = ttk.Entry(mw)
-
-diceTwoLabel = ttk.Label(mw, text = "Dice Two Sides:")
-diceTwoLabel.pack(pady = 2)
-diceTwoSides = ttk.Entry(mw)
-#mw.withdraw()
-#mw.update_idletasks()
-screen_width = mw.winfo_screenwidth()
-screen_height = mw.winfo_screenheight()
-scaled_widget_height = int(screen_height / 4)
-scaled_widget_width = int(screen_width / 4)
-middle_screen_width = int(screen_width / 2)
-middle_screen_height = int(screen_height / 2)
-
-x = (screen_width- scaled_widget_width) // 2
-y = (screen_height - scaled_widget_height) // 2
-mw.geometry(f"{scaled_widget_width}x{scaled_widget_height}+{x}+{y}")
-mw.deiconify()
-mw.lift()
-mw.mainloop()
-
-
-#side = int(input("How many sides do you want your first dice to have? "))
-#side_two = int(input("How many sides do you want your second dice to have? "))
-die_1 = Die(5)
-result = die_1.roll_dice(45)
+side = int(input("How many sides do you want your first dice to have? "))
+side_two = int(input("How many sides do you want your second dice to have? "))
+die_1 = Die(6)
+result = die_1.roll_dice(100)
 frequencies = die_1.get_frequencies(result)
 #we pass result because we calculate frequencies in get_frequencies
 die_1.create_histogram(result)
-
+die_1.visualize_scatter(result)
 #more examples 
 die_2 = Die(6)
 die_3 = Die(6)

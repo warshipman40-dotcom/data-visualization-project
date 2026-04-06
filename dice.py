@@ -1,5 +1,10 @@
 from random import randint
 import pygal
+import matplotlib.pyplot as plt
+import mplcursors as mpl
+from tkinter import messagebox
+from tkinter import filedialog
+from pathlib import Path
 import os
 class Die():
     """A class that represents a single die"""
@@ -48,6 +53,37 @@ class Die():
         hist.add("Expected results: ", [expected_result] * self.num_sides, stroke_style = {"width" : 2})
         hist.render_to_file(filename)
         os.startfile(filename)
-        
-        
+    
+    def cursor(self, scatter_plot, x, y):
+        cursor = mpl.cursor(scatter_plot, hover = True)
+        @cursor.connect("add")
+        def on_hover(sel):
+            sel.annotation.set_text(f"Side: {x[sel.index]} \nFrequency: {y[sel.index]}")
+
+    def visualize_scatter(self, results):
+        """Visualizes the rolls of a die in a scatter plot"""
+        sides = self.num_sides
+        rolls = self.num_rolls
+        #range starts from 0 and ends at n - 1 
+        x_values = [side for side in range(1, sides + 1)]
+        #x value plotted will be the dice numbers, while y value plotted will be dice frequencies
+        frequency = self.get_frequencies(results)
+        x, y = x_values, frequency
+        plt.title(f"Data of rolling a {sides} sided die {rolls} times")
+        plt.xlabel("Dice side", fontsize = 14)
+        plt.ylabel("Frequency of roll", fontsize = 14)
+        scatter_plot = plt.scatter(x, y, label = "Actual Data")
+        #calls the cursor method for the plotted points on the scatter plot
+        self.cursor(scatter_plot, x, y)
+
+        #expected distribution
+        expected_scatter_distribution_y = round(rolls / sides, 2)
+        expected_scatter_distribution_x = x_values.copy()
+        expected_scatter_distribution_y = [expected_scatter_distribution_y for y in range(1, sides + 1)]
+        expected_scatter_distribution = plt.scatter(expected_scatter_distribution_x, expected_scatter_distribution_y, label = "Expected Distribution")
+        #calls the cursor method for expected scatter distribution
+        self.cursor(expected_scatter_distribution, expected_scatter_distribution_x, expected_scatter_distribution_y)
+        plt.legend()
+        plt.show()
+
             

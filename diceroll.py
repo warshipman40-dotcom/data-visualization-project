@@ -9,6 +9,8 @@ import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
+from pathlib import Path
 import mplcursors as mpl
 import os
 class DiceGameRoll:
@@ -49,6 +51,7 @@ class DiceGameRoll:
             itemSum = sum(item)
             sums.append(itemSum)
         return sums
+    
     #to get all possible products, we need to get the number of sides from both dice
     #then we have to make a nested for loop so that every possibiltiy is multiplied
     #after that, we have to remove duplicates so the results aren't skewed
@@ -114,22 +117,14 @@ class DiceGameRoll:
         #returns frequencies so we can use it 
         return frequencies
 
-    def get_key_features(self, results, type = "sum", percentile = 50):
-        """Finds key features of a dataset"""
+    def get_key_features(self, results, type = "sum", percentile = 25):
+        """Finds key features of a dataset (default values set type = sum, percentile = 25)"""
         #this creates a dictionary where the name of the key feature and the value of the key feature can be stored
         key_features = {}
         #this variable stores the list of sums from results
         total_sum = self.get_sum(results)
         #this variable stores the list of products from results
         total_products = self.get_product(results)
-        #this variable stores all possible sums you can get
-        sum_values = self.get_all_possible_sums()
-        #this variable stores all possible products you can get
-        product_values = self.get_all_possible_products()
-        #this variable stores frequencies for each value of sums
-        sum_frequencies = self.get_frequencies(results)
-        #this variable stores frequencies for each value of products
-        product_frequencies = self.get_frequencies(results, "product")
         #uses a dictionary to store values
         if type == "sum":
             #this will find the average of the total sums list
@@ -194,40 +189,46 @@ class DiceGameRoll:
         elif type == "sum":
             hist.x_labels = self.get_all_possible_sums()
             hist.add("Data", self.get_frequencies(results))
-        #this stores the histogram o na fire
+        #this stores the histogram on a file
         hist.render_to_file(filename)
         #this uses os module to automatically open this file
         os.startfile(filename)
-
-    def visualize_scatter_data(self, results, type = "sum"):
+        
+    #default percentile
+    def visualize_scatter_data(self, results, type = "sum", percentile = 25):
         """Visualizes either the sum or product in a scatter plot"""
         sides = [str(die.num_sides) for die in self.dice]
         #the self in self.sides_text allows it to be stored in memory and used in different methods
         self.sides_text = ", ".join(sides)
+        sum_frequencies = self.get_frequencies(results)
+        product_frequencies = self.get_frequencies(results, "product")
         plt.title(f"Frequency Analysis of rolling {self.total_rolls} times! ({self.sides_text} sided dice)")
         plt.ylabel(f"Frequency of {type.title()}", fontsize = 18)
         #step basically divides the ticks into 10 sections and ensures it is > 1
-        step = max(1, max(self.get_frequencies(results)) // 10)
+        step = max(1, max(sum_frequencies) // 10)
         #plt.yticks put ticks from 0 all the way to the maximum value in frequency, moving up by the value of step each time
-        plt.yticks(range(0, max(self.get_frequencies(results)) + 1, step))
+        plt.yticks(range(0, max(sum_frequencies) + 1, step))
         
         if type == "product":
-            x, y = self.get_all_possible_products(), self.get_frequencies(results, "product")
+            x, y = self.get_all_possible_products(), product_frequencies
             plt.xlabel("Product", fontsize = 14)
             scatter = plt.scatter(x, y)
 
-            key_product_features = self.get_key_features(results, "product")
+            key_product_features = self.get_key_features(results, "product", percentile = 25)
             mode_value = key_product_features["mode"]["value"]
             mode_freq = key_product_features["mode"]["frequency"]
             #stores the value in a variable
             plt.scatter(mode_value, mode_freq, color="red")
             #median_value represents the x_value of the median
-            
             median_value = key_product_features["median"]
+            percentile_value = key_product_features["percentile"]
             mean_value = key_product_features["mean"]
             #plots green dotted line at median_value
             plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice products = {median_value}")
+            #plots black dotted line at mean value
             plt.axvline(x = mean_value, color = "black", linestyle = "--", label = f"Mean of dice products = {mean_value}")
+            #plots yellow line at percentile value (user input for percentile)
+            plt.axvline(x = percentile_value, color = "yellow", linestyle = "--", label = f"{percentile}th percentile of dice products = {percentile_value}")
             plt.legend()
             #creates a polynomial model
             my_model = np.poly1d(np.polyfit(x, y, 3))
@@ -237,7 +238,7 @@ class DiceGameRoll:
             relationship = round(r2_score(y, my_model(x)), 3)
 
         elif type == "sum":
-            x, y = self.get_all_possible_sums(), self.get_frequencies(results)
+            x, y = self.get_all_possible_sums(), sum_frequencies
             plt.xlabel("Sum", fontsize = 14)
             #creates a scatter plot of our graph
             scatter = plt.scatter(x, y)
@@ -251,12 +252,13 @@ class DiceGameRoll:
             #mode_value is a list that contains values inside of it (to plot multiple modes)
             for val in mode_value:
                 plt.scatter(val, mode_freq, color="red")
-
             median_value = key_sum_features["median"]
+            percentile_value = key_sum_features["percentile"]
             mean_value = key_sum_features["mean"]
             #this plots a green dotted line at the median value
             plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice sums = {median_value}")
             plt.axvline(x = mean_value, color = "black", linestyle = "--", label = f"Mean of dice sums = {mean_value}")
+            plt.axvline(x = percentile_value, color = "yellow", linestyle = "--", label = f"{percentile}th percentile of dice sums = {percentile_value}")
             plt.legend()
             #passes in our x and y values and creates a 3rd degree polynomial
             my_model = np.poly1d(np.polyfit(x, y, 3))
@@ -284,7 +286,7 @@ class DiceGameRoll:
             if type == "sum":
                 #we store the lists into variables just to make it less time consuming
                 sums = self.get_all_possible_sums()
-                frequencies = self.get_frequencies(results)
+                frequencies = sum_frequencies
                 #creates an annotation to display the x/y values
                 #We use type.title() because the text will be variable based on whether we want product / sum
                 #Frequency is a constant so we don't use a variable
@@ -293,11 +295,39 @@ class DiceGameRoll:
 
             elif type == "product":
                 products = self.get_all_possible_products()
-                frequencies = self.get_frequencies(results, "product")
+                frequencies = product_frequencies
                 sel.annotation.set_text(f"{type.title()}: {products[sel.index]} \nFrequency: {frequencies[sel.index]}")
         plt.grid(color = "grey", linestyle = "--", linewidth = 0.5)
-        #this should store the relationship data in a file for analysis
         plt.show()
+        self.choose_scatter_save_file()
+
+    def choose_scatter_save_file(self):
+        """Automatically gives the option to save scatter plots to a file"""
+        root = tk.Tk()
+        #prevents the blank root from showing
+        root.withdraw()
+        save_scatter = messagebox.askyesno("Save", "Save scatter plot?")
+        #automtically opens the save as dialog from your operating system
+        #default in case the user doesn't save
+        save_path = None
+        if save_scatter:
+            save_path = filedialog.asksaveasfilename(
+                parent = root,
+                #default folder
+                initialdir = Path.home() / "Desktop",
+                #default file name
+                initialfile = "scatter_plot.png",
+                title = "Save plot as",
+                #default filetype png
+                defaultextension = ".png",
+                #defines the valid filetypes
+                filetypes = [("PNG Files", "*.png" ), ("SVG Files", "*.svg"), ("PDF Files", "*.pdf")]
+            )
+        else:
+            messagebox.showwarning("Notifcation", "Scatter plot not saved")
+        #destroys the widget (root)
+        root.destroy()
+        return save_path
     
     def compare_scatter_data(self, results):
         plt.suptitle(f"Product vs Sum of rolling {self.sides_text} sided die {self.total_rolls} times!")
@@ -385,44 +415,42 @@ class DiceGameRoll:
         """Clears all data from the file"""
         #function gets called when the cancel button is clicked
         def cancel_action():
-            messagebox.showinfo("Operation Cancelled", "File deletion cancelled", parent = mw)
-            mw.destroy()
+            messagebox.showinfo("Operation Cancelled", "File deletion cancelled", parent = root)
+            root.destroy()
         #function is called when confirmation button is clicked
         def prompt_user():
              #creates a messagebox
-             #parent = mw ensures that messagebox always appears on top of mw
-            confirmation = messagebox.askyesno("Confirmation", f"Delete {filename}?", parent = mw)
+             #parent = root ensures that messagebox always appears on top of root
+            confirmation = messagebox.askyesno("Confirmation", f"Delete {filename}?", parent = root)
             #confirmation_label.pack()
             #confirmation_entry.pack()
             #confirmation_entry.focus()
             if confirmation:
             #asks a second confirmation to make 100% sure the user wants to wipe their data
-                second_confirmation = messagebox.askyesno("Confirm Again", "Confirm Again", parent = mw)
+                second_confirmation = messagebox.askyesno("Confirm Again", "Confirm Again", parent = root)
                 #message.box() returns a boolean 
                 if second_confirmation:
                 #since writing to a file automatically clears the file, we use pass to just clear the file without writing
                     with open(filename, "w") as file:
                         pass
                     messagebox.showinfo("Success", "File Succesfully Cleared!")
-                    mw.destroy()
                     os.startfile(filename)
+                    root.destroy()
         
-        #creates the widget object and stores in mw
+        #creates the widget object and stores in root
         #uses toplevel because in the main theres already a tk.Tk()
         #toplevel is linked to the existing root in the main class
-        mw = tk.Toplevel()
-        #this moves window to the top of the stacking order
-        mw.lift()
+        root = tk.Tk()
         #this then forces the window to stay above all other windows on computer
-        mw.attributes("-topmost", True)
+        root.attributes("-topmost", True)
         #this gives the window time to go to the top, and then resets after
-        mw.after(0, lambda: mw.attributes("-topmost", False))
+        root.after(0, lambda: root.attributes("-topmost", False))
         #var = tk.StringVar(value = "yes")
-        #confirmation_entry = ttk.Entry(mw, textvariable = var, width=50, font=("Arial", 12))
-        #confirmation_label = ttk.Label(mw, text = f"Clear Data \n(Yes / No)")
+        #confirmation_entry = ttk.Entry(root, textvariable = var, width=50, font=("Arial", 12))
+        #confirmation_label = ttk.Label(root, text = f"Clear Data \n(Yes / No)")
         #these functions get the width and height of a device screen
-        screen_width = mw.winfo_screenwidth()
-        screen_height = mw.winfo_screenheight()
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
 
         scaled_widget_width = int(screen_width / 4)
         scaled_widget_height = int(screen_height / 4)
@@ -433,18 +461,17 @@ class DiceGameRoll:
         screen_middle_height = (screen_height - scaled_widget_height) // 2
 
         #order of width * height
-        mw.geometry(f"{scaled_widget_width}x{scaled_widget_height}+{screen_middle_width}+{screen_middle_height}")
-        tk.Label(mw, text = f"Clear {filename}?", font = ("Arial", 20)).pack()
+        root.geometry(f"{scaled_widget_width}x{scaled_widget_height}+{screen_middle_width}+{screen_middle_height}")
+        tk.Label(root, text = f"Clear {filename}?", font = ("Arial", 20)).pack()
         #creates the confirm button object
-        confirm = tk.Button(mw, text = "CONFIRM", width = 12, command = prompt_user)
+        confirm = tk.Button(root, text = "CONFIRM", width = 12, command = prompt_user)
         #packs the confirm button in a window / widget
         confirm.pack(side = "left", padx = 40)
-        #mw.destroy() immediately closes the window
-        cancel = tk.Button(mw, text = "CANCEL", width = 12, command = cancel_action)
+        #root.destroy() immediately closes the window
+        cancel = tk.Button(root, text = "CANCEL", width = 12, command = cancel_action)
         cancel.pack(side = "right", padx = 40)
-        #starts an infinite loop for the window/widget object (mw) and waits for an event
-        mw.mainloop()
-
+        #starts an infinite loop for the window/widget object (root) and waits for an event
+        root.mainloop()
         
 
             
