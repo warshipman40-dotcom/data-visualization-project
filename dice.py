@@ -42,5 +42,12 @@ class Die():
         hist.y_title = "Frequencies"
         #this ensures the bar has the height of the value in frequencies for each
         hist.add("D6 Dice", frequencies)
+        #calculates expected results for a number of dice rolls based on the number of dice sides
+        expected_result = round(self.num_rolls / self.num_sides, 3)        
+        #adds side by side comparison of expected vs actual results
+        hist.add("Expected results: ", [expected_result] * self.num_sides, stroke_style = {"width" : 2})
         hist.render_to_file(filename)
         os.startfile(filename)
+        
+        
+            

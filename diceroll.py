@@ -2,6 +2,7 @@ from dice import Die
 from collections import Counter
 from sklearn.metrics import r2_score
 import pygal
+import json
 from scipy import stats
 import matplotlib.pyplot as plt
 import numpy as np
@@ -101,6 +102,7 @@ class DiceGameRoll:
                 frequencyOfValue = self.get_sum(results).count(value)
                 #appends the value of total matches in our frequencies list
                 frequencies.append(frequencyOfValue)
+        
         elif type == "product":
             possible_values = self.get_all_possible_products()
             for value in possible_values:
@@ -128,7 +130,7 @@ class DiceGameRoll:
         #uses a dictionary to store values
         if type == "sum":
             #this will find the average of the total sums list
-            key_features["average"] = np.mean(total_sum)
+            key_features["mean"] = np.mean(total_sum)
             #this will find the median of the total sums list
             key_features["median"] = np.median(total_sum)
             #counter method will essentially build a {value : frequency} dictionary for you
@@ -147,15 +149,15 @@ class DiceGameRoll:
                 "frequency" : max_freq
             }
             #standard deviance describes how close the values are to the mean
-            key_features["standard_deviation"] = np.std(total_sum)
+            key_features["standard_deviation"] = round(np.std(total_sum), 3)
             #standard deviance is the square root of variance
-            key_features["variance"] = np.var(total_sum)
+            key_features["variance"] = round(np.var(total_sum), 3)
             key_features["percentile"] = np.percentile(total_sum, percentile)
         
         elif type == "product":
             #key_features["max"] = max(total_products)
             #key_features["min"] = min(total_products)
-            key_features["average"] = np.mean(total_products)
+            key_features["mean"] = np.mean(total_products)
             key_features["median"] = np.median(total_products)
             counter = Counter(total_products)
             max_freq = max(counter.values())
@@ -164,8 +166,8 @@ class DiceGameRoll:
                 "value" : modes,
                 "frequency" : max_freq
             }
-            key_features["standard_deviation"] = np.std(total_products)
-            key_features["variance"] = np.var(total_products)
+            key_features["standard_deviation"] = round(np.std(total_products), 3)
+            key_features["variance"] = round(np.var(total_products), 3)
             key_features["percentile"] = np.percentile(total_products, percentile)
         print(f"Returning key features of total {type.title()}'s")
         return key_features
@@ -219,8 +221,10 @@ class DiceGameRoll:
             #median_value represents the x_value of the median
             
             median_value = key_product_features["median"]
+            mean_value = key_product_features["mean"]
             #plots green dotted line at median_value
             plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice products = {median_value}")
+            plt.axvline(x = mean_value, color = "black", linestyle = "--", label = f"Mean of dice products = {mean_value}")
             plt.legend()
             #creates a polynomial model
             my_model = np.poly1d(np.polyfit(x, y, 3))
@@ -246,8 +250,10 @@ class DiceGameRoll:
                 plt.scatter(val, mode_freq, color="red")
 
             median_value = key_sum_features["median"]
+            mean_value = key_sum_features["mean"]
             #this plots a green dotted line at the median value
             plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice sums = {median_value}")
+            plt.axvline(x = mean_value, color = "black", linestyle = "--", label = f"Mean of dice sums = {mean_value}")
             plt.legend()
             #passes in our x and y values and creates a 3rd degree polynomial
             my_model = np.poly1d(np.polyfit(x, y, 3))
@@ -323,3 +329,68 @@ class DiceGameRoll:
         def on_hover_product(sel):
             sel.annotation.set_text(f"Product: {products[sel.index]} \nFrequency : {product_frequencies[sel.index]}")
         plt.show()  
+        #default name dice_results.json, default type = sum
+    
+    def save_data(self, results, filename = "dice_results.json", type = "sum"):
+        """Save dice results and key features into a JSON file"""
+        #checks if the type will be a sum/product
+        if type == "sum":
+            values = self.get_all_possible_sums()
+            frequencies = self.get_frequencies(results)
+            key_features = self.get_key_features(results)
+        elif type == "product":
+            values = self.get_all_possible_products()
+            frequencies = self.get_frequencies(results, "product")
+            key_features = self.get_key_features(results, "product")
+        #stores the data into a dictionary 
+        data = {
+            "values" : values, 
+            "frequencies" : frequencies, 
+            "key_features" : key_features
+        }
+        #makes sure that the file exists
+        if os.path.exists(filename):
+            #opens and reads the file
+            #using write will overwrite, which is why we use read
+            #this method will basically store our existing data from the file using json.load()
+            #and store it existing data, before appending our new data (data) to essentially append our data at the end
+            with open(filename, "r") as file:
+                try:
+                    #converts the json data into a python object like a dictionary
+                    existing_data = json.load(file)
+                #make sure it's a list so we can use append
+                    if not isinstance(existing_data, list):
+                        #if not a list, turns it into a list
+                        existing_data = [existing_data]
+                except json.JSONDecodeError:
+                    #if an error is encountered, start with an empty file
+                    existing_data = []
+        else:
+            #if file doesn't exist, start withs an empty file
+            existing_data = []
+        #directly appending doesn't work with JSON because it breaks the structure
+        existing_data.append(data)
+        with open(filename, "w") as file:
+                #this converts a python object into a json string
+                #indenting makes easier to read results
+                #json.dump must dump existing data to a JSON file because existing data contains all of our new data
+                #this is because our data gets wiped each time when we use write
+                json.dump(existing_data, file, indent = 3)
+        print(f"Data succesfully saved to {filename}!")
+        os.startfile(filename)
+
+    def clear_file_data(self, filename = "dice_results.json", confirmation = False):
+        """Clears all data from the file (requires  confirmation = True)"""
+        if confirmation:
+            #asks a second confirmation to make 100% sure the user wants to wipe their data
+            second_confirmation = input(f"Are you 100% sure you want to wipe all your data from {filename} (answer in yes/no)")
+            if second_confirmation.lower() == "yes":
+                #since writing to a file automatically clears the file, we use pass to just clear the file without writing
+                with open(filename, "w") as file:
+                    pass
+                print("File succesfully cleared")
+            else:
+                print("Operation cancelled")
+
+            
+
