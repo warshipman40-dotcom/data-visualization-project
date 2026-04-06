@@ -6,6 +6,8 @@ import json
 from scipy import stats
 import matplotlib.pyplot as plt
 import numpy as np
+import tkinter as tk
+from tkinter import ttk
 import mplcursors as mpl
 import os
 class DiceGameRoll:
@@ -379,18 +381,60 @@ class DiceGameRoll:
         print(f"Data succesfully saved to {filename}!")
         os.startfile(filename)
 
-    def clear_file_data(self, filename = "dice_results.json", confirmation = False):
-        """Clears all data from the file (requires  confirmation = True)"""
-        if confirmation:
+    def clear_file_data(self, filename = "dice_results.json", confirmation = True):
+        """Clears all data from the file"""
+
+        #function gets called when the cancel button is clicked
+        def cancel_action():
+            print("Operation cancelled")
+            mw.destroy()
+        #function is called when confirmation button is clicked
+        def prompt_user():
+            confirmation_label.pack()
+            confirmation_entry.pack()
+            confirmation_entry.focus()
+            if confirmation:
             #asks a second confirmation to make 100% sure the user wants to wipe their data
-            second_confirmation = input(f"Are you 100% sure you want to wipe all your data from {filename} (answer in yes/no)")
-            if second_confirmation.lower() == "yes":
+                second_confirmation = "no"
+                #second_confirmation = input(f"Are you 100% sure you want to wipe all your data from {filename} (answer in yes/no)")
+                if second_confirmation.lower() == "yes":
                 #since writing to a file automatically clears the file, we use pass to just clear the file without writing
-                with open(filename, "w") as file:
-                    pass
-                print("File succesfully cleared")
-            else:
-                print("Operation cancelled")
+                    with open(filename, "w") as file:
+                        pass
+                    print("File succesfully cleared")
+                    mw.destroy()
+        
+        #creates the widget object and stores in mw
+        mw = tk.Tk()
+        var = tk.StringVar(value = "yes")
+        confirmation_entry = ttk.Entry(mw, textvariable = var, width=50, font=("Arial", 12))
+        confirmation_label = ttk.Label(mw, text = f"Clear Data \n(Yes / No)")
+        #these functions get the width and height of a device screen
+        screen_width = mw.winfo_screenwidth()
+        screen_height = mw.winfo_screenheight()
+
+        scaled_widget_width = int(screen_width / 4)
+        scaled_widget_height = int(screen_height / 4)
+        screen_middle_width = int(screen_width / 2)
+        screen_middle_height = int(screen_height / 2)
+
+        screen_middle_width = (screen_width - scaled_widget_width) // 2
+        screen_middle_height = (screen_height - scaled_widget_height) // 2
+
+        #order of width * height
+        mw.geometry(f"{scaled_widget_width}x{scaled_widget_height}+{screen_middle_width}+{screen_middle_height}")
+        tk.Label(mw, text = f"Clear {filename}?", font = ("Arial", 20)).pack()
+        #creates the confirm button object
+        confirm = tk.Button(mw, text = "CONFIRM", width = 12, command = prompt_user)
+        #packs the confirm button in a window / widget
+        confirm.pack(side = "left", padx = 40)
+        #mw.destroy() immediately closes the window
+        cancel = tk.Button(mw, text = "CANCEL", width = 12, command = cancel_action)
+        cancel.pack(side = "right", padx = 40)
+        #starts an infinite loop for the window/widget object (mw) and waits for an event
+        mw.mainloop()
+
+        
 
             
 

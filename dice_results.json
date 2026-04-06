@@ -1,0 +1,1093 @@
+[
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         2,
+         6,
+         6,
+         7,
+         6,
+         7,
+         8,
+         5,
+         1,
+         1
+      ],
+      "key_features": {
+         "mean": 6.94,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               9
+            ],
+            "frequency": 8
+         },
+         "standard_deviation": 2.31,
+         "variance": 5.336,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         7,
+         1,
+         1,
+         7,
+         16,
+         9,
+         5,
+         1,
+         2,
+         0
+      ],
+      "key_features": {
+         "mean": 6.7,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 16
+         },
+         "standard_deviation": 2.11,
+         "variance": 4.45,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         0,
+         2,
+         4,
+         1,
+         9,
+         10,
+         8,
+         8,
+         3,
+         4,
+         1
+      ],
+      "key_features": {
+         "mean": 7.46,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 10
+         },
+         "standard_deviation": 2.128,
+         "variance": 4.528,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11
+      ],
+      "frequencies": [
+         1,
+         1,
+         4,
+         7,
+         9,
+         12,
+         7,
+         5,
+         2,
+         2
+      ],
+      "key_features": {
+         "mean": 6.74,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 12
+         },
+         "standard_deviation": 1.937,
+         "variance": 3.752,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         3,
+         1,
+         1,
+         14,
+         8,
+         8,
+         2,
+         6,
+         5,
+         0,
+         2
+      ],
+      "key_features": {
+         "mean": 6.62,
+         "median": 6.0,
+         "mode": {
+            "value": [
+               5
+            ],
+            "frequency": 14
+         },
+         "standard_deviation": 2.357,
+         "variance": 5.556,
+         "percentile": 6.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         2,
+         3,
+         7,
+         8,
+         10,
+         6,
+         4,
+         5,
+         2,
+         1
+      ],
+      "key_features": {
+         "mean": 6.86,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 10
+         },
+         "standard_deviation": 2.315,
+         "variance": 5.36,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         3,
+         1,
+         6,
+         7,
+         7,
+         8,
+         4,
+         8,
+         3,
+         2
+      ],
+      "key_features": {
+         "mean": 7.46,
+         "median": 7.5,
+         "mode": {
+            "value": [
+               8,
+               10
+            ],
+            "frequency": 8
+         },
+         "standard_deviation": 2.435,
+         "variance": 5.928,
+         "percentile": 7.5
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         0,
+         3,
+         3,
+         10,
+         4,
+         5,
+         8,
+         6,
+         6,
+         4,
+         1
+      ],
+      "key_features": {
+         "mean": 7.28,
+         "median": 7.5,
+         "mode": {
+            "value": [
+               5
+            ],
+            "frequency": 10
+         },
+         "standard_deviation": 2.409,
+         "variance": 5.802,
+         "percentile": 7.5
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         0,
+         1,
+         5,
+         5,
+         5,
+         7,
+         13,
+         6,
+         4,
+         3,
+         1
+      ],
+      "key_features": {
+         "mean": 7.4,
+         "median": 8.0,
+         "mode": {
+            "value": [
+               8
+            ],
+            "frequency": 13
+         },
+         "standard_deviation": 2.117,
+         "variance": 4.48,
+         "percentile": 8.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         3,
+         1,
+         1,
+         5,
+         5,
+         8,
+         8,
+         7,
+         6,
+         4,
+         2
+      ],
+      "key_features": {
+         "mean": 7.58,
+         "median": 8.0,
+         "mode": {
+            "value": [
+               8,
+               7
+            ],
+            "frequency": 8
+         },
+         "standard_deviation": 2.499,
+         "variance": 6.244,
+         "percentile": 8.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11
+      ],
+      "frequencies": [
+         4,
+         1,
+         8,
+         4,
+         5,
+         9,
+         5,
+         4,
+         8,
+         2
+      ],
+      "key_features": {
+         "mean": 6.68,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 9
+         },
+         "standard_deviation": 2.565,
+         "variance": 6.578,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         6,
+         3,
+         2,
+         8,
+         11,
+         7,
+         6,
+         1,
+         3,
+         1
+      ],
+      "key_features": {
+         "mean": 6.68,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 11
+         },
+         "standard_deviation": 2.437,
+         "variance": 5.938,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         2,
+         5,
+         8,
+         3,
+         11,
+         6,
+         8,
+         3,
+         2,
+         0
+      ],
+      "key_features": {
+         "mean": 6.74,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 11
+         },
+         "standard_deviation": 2.261,
+         "variance": 5.112,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         3,
+         5,
+         2,
+         8,
+         8,
+         8,
+         3,
+         6,
+         5,
+         1
+      ],
+      "key_features": {
+         "mean": 7.26,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               8,
+               7,
+               6
+            ],
+            "frequency": 8
+         },
+         "standard_deviation": 2.488,
+         "variance": 6.192,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         0,
+         1,
+         2,
+         10,
+         4,
+         8,
+         8,
+         4,
+         6,
+         6,
+         1
+      ],
+      "key_features": {
+         "mean": 7.58,
+         "median": 7.5,
+         "mode": {
+            "value": [
+               5
+            ],
+            "frequency": 10
+         },
+         "standard_deviation": 2.281,
+         "variance": 5.204,
+         "percentile": 7.5
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         3,
+         4,
+         1,
+         11,
+         6,
+         7,
+         7,
+         9,
+         1,
+         1,
+         0
+      ],
+      "key_features": {
+         "mean": 6.4,
+         "median": 6.5,
+         "mode": {
+            "value": [
+               5
+            ],
+            "frequency": 11
+         },
+         "standard_deviation": 2.227,
+         "variance": 4.96,
+         "percentile": 6.5
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         0,
+         3,
+         1,
+         6,
+         12,
+         13,
+         7,
+         4,
+         1,
+         2,
+         1
+      ],
+      "key_features": {
+         "mean": 6.84,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 13
+         },
+         "standard_deviation": 1.901,
+         "variance": 3.614,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         2,
+         4,
+         2,
+         11,
+         15,
+         5,
+         3,
+         5,
+         1,
+         0
+      ],
+      "key_features": {
+         "mean": 6.7,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 15
+         },
+         "standard_deviation": 2.052,
+         "variance": 4.21,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         3,
+         3,
+         5,
+         11,
+         5,
+         7,
+         6,
+         5,
+         3,
+         1,
+         1
+      ],
+      "key_features": {
+         "mean": 6.3,
+         "median": 6.0,
+         "mode": {
+            "value": [
+               5
+            ],
+            "frequency": 11
+         },
+         "standard_deviation": 2.394,
+         "variance": 5.73,
+         "percentile": 6.0
+      }
+   },
+   {
+      "values": [
+         2
+      ],
+      "frequencies": [
+         50
+      ],
+      "key_features": {
+         "mean": 2.0,
+         "median": 2.0,
+         "mode": {
+            "value": [
+               2
+            ],
+            "frequency": 50
+         },
+         "standard_deviation": 0.0,
+         "variance": 0.0,
+         "percentile": 2.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         7,
+         2,
+         2,
+         7,
+         9,
+         7,
+         7,
+         5,
+         2,
+         1
+      ],
+      "key_features": {
+         "mean": 6.98,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 9
+         },
+         "standard_deviation": 2.478,
+         "variance": 6.14,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         2,
+         3,
+         2,
+         6,
+         8,
+         8,
+         10,
+         4,
+         5,
+         1
+      ],
+      "key_features": {
+         "mean": 7.66,
+         "median": 8.0,
+         "mode": {
+            "value": [
+               9
+            ],
+            "frequency": 10
+         },
+         "standard_deviation": 2.303,
+         "variance": 5.304,
+         "percentile": 8.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         7,
+         4,
+         9,
+         1,
+         6,
+         9,
+         5,
+         4,
+         2,
+         1
+      ],
+      "key_features": {
+         "mean": 6.5,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               5,
+               8
+            ],
+            "frequency": 9
+         },
+         "standard_deviation": 2.625,
+         "variance": 6.89,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         1,
+         5,
+         4,
+         6,
+         7,
+         6,
+         7,
+         7,
+         2,
+         3
+      ],
+      "key_features": {
+         "mean": 7.42,
+         "median": 7.5,
+         "mode": {
+            "value": [
+               7,
+               9,
+               10
+            ],
+            "frequency": 7
+         },
+         "standard_deviation": 2.562,
+         "variance": 6.564,
+         "percentile": 7.5
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         1,
+         4,
+         3,
+         9,
+         9,
+         5,
+         7,
+         6,
+         3,
+         2,
+         1
+      ],
+      "key_features": {
+         "mean": 6.68,
+         "median": 6.0,
+         "mode": {
+            "value": [
+               5,
+               6
+            ],
+            "frequency": 9
+         },
+         "standard_deviation": 2.328,
+         "variance": 5.418,
+         "percentile": 6.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         2,
+         0,
+         1,
+         11,
+         10,
+         4,
+         5,
+         6,
+         3,
+         7,
+         1
+      ],
+      "key_features": {
+         "mean": 7.28,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               5
+            ],
+            "frequency": 11
+         },
+         "standard_deviation": 2.458,
+         "variance": 6.042,
+         "percentile": 7.0
+      }
+   },
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12
+      ],
+      "frequencies": [
+         4,
+         2,
+         5,
+         7,
+         5,
+         7,
+         8,
+         2,
+         7,
+         0,
+         3
+      ],
+      "key_features": {
+         "mean": 6.72,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               8
+            ],
+            "frequency": 8
+         },
+         "standard_deviation": 2.684,
+         "variance": 7.202,
+         "percentile": 7.0
+      }
+   }
+]
