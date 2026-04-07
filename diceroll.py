@@ -4,16 +4,18 @@ from collections import Counter
 from sklearn.metrics import r2_score
 import pygal
 import json
-from scipy import stats
 import matplotlib.pyplot as plt
 import numpy as np
 import tkinter as tk
-from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 from pathlib import Path
 import mplcursors as mpl
+import platform
+import subprocess
 import os
+from itertools import product
+
 class DiceGameRoll:
     """A class that allows you to roll multiple dice and find product / sum"""
     def __init__(self, dice):
@@ -24,7 +26,7 @@ class DiceGameRoll:
     #if let blank, will roll 100 times by default  
     def roll_all(self, total_rolls = 100):
         self.total_rolls = total_rolls
-        """This lets you combine dice with different sides"""
+        """This lets you combine dice with different sides (100 rolls by default)"""
         #this will let you combine dice with different sides and examine data
         results = []
         for roll in range(total_rolls):
@@ -129,7 +131,7 @@ class DiceGameRoll:
         #uses a dictionary to store values
         if type == "sum":
             #this will find the average of the total sums list
-            key_features["mean"] = np.mean(total_sum)
+            key_features["mean"] = round(np.mean(total_sum), 3)
             #this will find the median of the total sums list
             key_features["median"] = np.median(total_sum)
             #counter method will essentially build a {value : frequency} dictionary for you
@@ -156,7 +158,7 @@ class DiceGameRoll:
         elif type == "product":
             #key_features["max"] = max(total_products)
             #key_features["min"] = min(total_products)
-            key_features["mean"] = np.mean(total_products)
+            key_features["mean"] = round(np.mean(total_products), 3)
             key_features["median"] = np.median(total_products)
             counter = Counter(total_products)
             max_freq = max(counter.values())
@@ -192,8 +194,8 @@ class DiceGameRoll:
             hist.add("Data", self.get_frequencies(results))
         #this stores the histogram on a file
         hist.render_to_file(filename)
-        #this uses os module to automatically open this file
-        os.startfile(filename)
+        #uses this method to check what type of operating system their is to correctly open file
+        self.operating_system_type(filename)
 
     #default percentile
     def visualize_scatter_data(self, results, type = "sum", percentile = 25):
@@ -209,7 +211,7 @@ class DiceGameRoll:
         step = max(1, max(sum_frequencies) // 10)
         #plt.yticks put ticks from 0 all the way to the maximum value in frequency, moving up by the value of step each time
         plt.yticks(range(0, max(sum_frequencies) + 1, step))
-        
+
         if type == "product":
             x, y = self.get_all_possible_products(), product_frequencies
             plt.xlabel("Product", fontsize = 14)
@@ -218,8 +220,9 @@ class DiceGameRoll:
             key_product_features = self.get_key_features(results, "product", percentile = 25)
             mode_value = key_product_features["mode"]["value"]
             mode_freq = key_product_features["mode"]["frequency"]
+            for val in mode_value:
+                plt.scatter(val, mode_freq, color = "red")
             #stores the value in a variable
-            plt.scatter(mode_value, mode_freq, color="red")
             #median_value represents the x_value of the median
             median_value = key_product_features["median"]
             percentile_value = key_product_features["percentile"]
@@ -230,16 +233,33 @@ class DiceGameRoll:
             plt.axvline(x = mean_value, color = "black", linestyle = "--", label = f"Mean of dice products = {mean_value}")
             #plots yellow line at percentile value (user input for percentile)
             plt.axvline(x = percentile_value, color = "yellow", linestyle = "--", label = f"{percentile}th percentile of dice products = {percentile_value}")
-            plt.legend()
             #creates a polynomial model
             my_model = np.poly1d(np.polyfit(x, y, 3))
             #specifys where the line will display (where we start, where we end, and the highest point)
             myline = np.linspace(min(x), max(x), max(y))
             plt.plot(myline, my_model(myline))
+            plt.legend()
             relationship = round(r2_score(y, my_model(x)), 3)
 
         elif type == "sum":
+            response = messagebox.askyesno("Theoretical Sums", "Would you like to add theoretical sums to your graph?")
+            #if user  wants to add theoretical sums
+            if response:
+                #stores the tuples of theoretical_distribution, (theo_values, and theo_frequencies)
+                theo_values, theo_frequencies = self.get_theoretical_distribution()
+                #stores the length of all rolls into all_rolls
+                all_rolls = len(results)
+                #sets the scaling factor by diving the length of all rolls by the sum of all frequencies
+                scale_factor = all_rolls / sum(theo_frequencies)
+                #uses list comprenhension to make the new list have each frequency at the new scaled value
+                #this causes it to be accurate to the actual number of rolls simulated
+                scaled_theoretical = [frequency * scale_factor for frequency in theo_frequencies]
+                plt.plot(theo_values, scaled_theoretical, color = "red", linestyle = "--", label = "Theoretical Sums")
+            else:
+                messagebox.showinfo("Theoretical Sums", "Theoretical Sums not added")
             x, y = self.get_all_possible_sums(), sum_frequencies
+            #since theoretical distribution returns two results, this can effectively be unpacked            
+
             plt.xlabel("Sum", fontsize = 14)
             #creates a scatter plot of our graph
             scatter = plt.scatter(x, y)
@@ -260,11 +280,11 @@ class DiceGameRoll:
             plt.axvline(x = median_value, color = "green", linestyle = "--", label = f"Median of dice sums = {median_value}")
             plt.axvline(x = mean_value, color = "black", linestyle = "--", label = f"Mean of dice sums = {mean_value}")
             plt.axvline(x = percentile_value, color = "yellow", linestyle = "--", label = f"{percentile}th percentile of dice sums = {percentile_value}")
-            plt.legend()
             #passes in our x and y values and creates a 3rd degree polynomial
             my_model = np.poly1d(np.polyfit(x, y, 3))
             myline = np.linspace(min(x), max(x), max(y))
             plt.plot(myline, my_model(myline))
+            plt.legend()
             #a relationship of 1 means a very good fit / 0.0 means the mean / less than 0.0 is a very bad fit
             #r2_score is a method we import
             #we pass in actual data (y) and model predictions (my_model(x)) to calculate the r2 score
@@ -308,25 +328,27 @@ class DiceGameRoll:
         #prevents the blank root from showing
         root.withdraw()
         save_scatter = messagebox.askyesno("Save", "Save scatter plot?")
-        #automtically opens the save as dialog from your operating system
-        #default in case the user doesn't save
+        #default if user chooses not to save, prevents errors
         save_path = None
+        #automtically opens the save as dialog from your operating system
         if save_scatter:
             save_path = filedialog.asksaveasfilename(
-                parent = root,
-                #default folder
-                initialdir = Path.home() / "Desktop",
-                #default file name
-                initialfile = "scatter_plot.png",
-                title = "Save plot as",
-                #default filetype png
-                defaultextension = ".png",
-                #defines the valid filetypes
-                filetypes = [("PNG Files", "*.png" ), ("SVG Files", "*.svg"), ("PDF Files", "*.pdf")]
+            parent = root,
+            #default folder
+            initialdir = Path.home() / "Desktop",
+            #default file name
+            initialfile = "scatter_plot.png",
+            title = "Save plot as",
+            #default filetype png
+            defaultextension = ".png",
+            #defines the valid filetypes
+            filetypes = [("PNG Files", "*.png" ), ("SVG Files", "*.svg"), ("PDF Files", "*.pdf")]
             )
+        if save_path:
+            plt.savefig(save_path)
             messagebox.showinfo("Notification", "Scatter plot successfully saved!")
         else:
-            messagebox.showwarning("Notifcation", "Scatter plot not saved")
+            messagebox.showwarning("Notification", "Scatter plot not saved")
         #destroys the widget (root)
         root.destroy()
         return save_path
@@ -365,6 +387,23 @@ class DiceGameRoll:
             sel.annotation.set_text(f"Product: {products[sel.index]} \nFrequency : {product_frequencies[sel.index]}")
         plt.show()  
         #default name dice_results.json, default type = sum
+    
+    def get_theoretical_distribution(self, type = "sum"):
+        """Returns theoretical probabilities of dice roll sums"""
+        #creates a list of ranges for each die in self.dice
+        ranges = [range(1, die.num_sides + 1) for die in self.dice]
+        #* unpacks the list into seperate arguments 
+        outcomes = list(product(*ranges))
+        #uses sum on the tuples to get the sum of each outcome
+        if type == "sum":
+            values = [sum(outcome) for outcome in outcomes]
+        #products distribution is too skewed and messy in large quantities 
+        #will probably work on this in the future
+        #creates a counter object that includes the objects value and frequency
+        counter = Counter(values)
+        sorted_values = sorted(counter.keys())
+        frequencies = [counter[value] for value in sorted_values]
+        return sorted_values, frequencies
     
     def save_data(self, results, filename = "dice_results.json", type = "sum"):
         """Save dice results and key features into a JSON file"""
@@ -433,7 +472,7 @@ class DiceGameRoll:
                     with open(filename, "w") as file:
                         pass
                     messagebox.showinfo("Success", "File Succesfully Cleared!")
-                    os.startfile(filename)
+                    self.operating_system_type(filename)
                     root.destroy()
         #callback function on_close
         def on_close():
@@ -468,5 +507,14 @@ class DiceGameRoll:
         #starts an infinite loop for the window/widget object (root) and waits for an event
         root.mainloop()
 
-            
-
+    def operating_system_type(self, filename):
+        #windows
+        if platform.system() == "Windows":
+            os.startfile(filename)
+            #mac
+        elif platform.system() == "Darwin":
+            subprocess.run(["open", filename])
+        else:
+            #linux
+            subprocess.run(["xdg-open", filename])
+  

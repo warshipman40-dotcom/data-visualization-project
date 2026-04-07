@@ -4,10 +4,11 @@ import pygal
 import matplotlib.pyplot as plt
 import mplcursors as mpl
 import tkinter as tk
-from tkinter import Tk
 from tkinter import messagebox
 from tkinter import filedialog
 from pathlib import Path
+import platform
+import subprocess
 import os
 class Die():
     """A class that represents a single die"""
@@ -55,7 +56,7 @@ class Die():
         #adds side by side comparison of expected vs actual results
         hist.add("Expected results: ", [expected_result] * self.num_sides, stroke_style = {"width" : 2})
         hist.render_to_file(filename)
-        os.startfile(filename)
+        self.operating_system_type(filename)
     
     def cursor(self, scatter_plot, x, y):
         cursor = mpl.cursor(scatter_plot, hover = True)
@@ -112,3 +113,11 @@ class Die():
         #destroys widget
         root.destroy()
         return save_path
+    
+    def operating_system_type(self, filename):
+        if platform.system == "Windows":
+            os.startfile(filename)
+        elif platform.system() == "Darwin":
+            subprocess.run(["open", filename])
+        else:
+            subprocess.run(["xdg-open", filename])

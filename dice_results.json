@@ -1,0 +1,41 @@
+[
+   {
+      "values": [
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11
+      ],
+      "frequencies": [
+         5,
+         7,
+         16,
+         12,
+         8,
+         19,
+         10,
+         11,
+         10,
+         2
+      ],
+      "key_features": {
+         "mean": 6.37,
+         "median": 7.0,
+         "mode": {
+            "value": [
+               7
+            ],
+            "frequency": 19
+         },
+         "standard_deviation": 2.394,
+         "variance": 5.733,
+         "percentile": 4.0
+      }
+   }
+]

@@ -30,10 +30,10 @@ entryTwo.grid(row = 1, column = 1, pady = 5, sticky = "w")
 entryThree.grid(row = 2, column = 1, pady = 5, sticky = "w")
 #this places the frame at 50% of the roots width and 50% of the roots height in the center
 frame.place(relx = 0.5, rely = 0.5, anchor = "center")
-dice_values = []
+dice_info = []
 def get_values():
     #entry.get() returns a string so it must be converted to int
-    global dice_values
+    global dice_info
     try:
         sideOne = int(entryOne.get())
         sideTwo = int(entryTwo.get())
@@ -61,11 +61,12 @@ die_1.visualize_scatter(result)
 #more examples
 #uses a try except to provide a user friendly message
 try: 
-    die_2 = Die(dice_values[0])
-    die_3 = Die(dice_values[1])
+    die_2 = Die(dice_info[0])
+    die_3 = Die(dice_info[1])
     game = DiceGameRoll([die_2, die_3])
     #dice_values[-1] will always give the last value in the list
-    rolls = game.roll_all(dice_values[-1])
+    rolls = game.roll_all(dice_info[-1])
+#reminder -take a look at this later because the index error gets called even when the list is populated
 except IndexError:
     #informs the user of an index error where the list is not populated
     messagebox.showwarning("Index Error", "Index Error, list is not populated")
