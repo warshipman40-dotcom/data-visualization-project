@@ -1,3 +1,4 @@
+#rolling multiple dice class
 from dice import Die
 from collections import Counter
 from sklearn.metrics import r2_score
@@ -423,9 +424,6 @@ class DiceGameRoll:
              #creates a messagebox
              #parent = root ensures that messagebox always appears on top of root
             confirmation = messagebox.askyesnocancel("Confirmation", f"Delete {filename}?", parent = root)
-            #confirmation_label.pack()
-            #confirmation_entry.pack()
-            #confirmation_entry.focus()
             if confirmation:
             #asks a second confirmation to make 100% sure the user wants to wipe their data
                 second_confirmation = messagebox.askyesno("Confirm Again", "Confirm Again", parent = root)
@@ -437,48 +435,36 @@ class DiceGameRoll:
                     messagebox.showinfo("Success", "File Succesfully Cleared!")
                     os.startfile(filename)
                     root.destroy()
-        
-        #creates the widget object and stores in root
-        #uses toplevel because in the main theres already a tk.Tk()
-        #toplevel is linked to the existing root in the main class
-        root = tk.Tk()
-        #registers a callback function on root event ("WM_DELETE_WINDOW")
         #callback function on_close
         def on_close():
-            messagebox.showinfo("Success", "Succesfully saved data!")
+            messagebox.showinfo("Saved", "Succesfully saved data!")
             #closes root after succesfully showing message
             root.destroy()
-        #protocol runs 
-        root.protocol("WM_DELETE_WINDOW", on_close)
-        #this then forces the window to stay above all other windows on computer
-        root.attributes("-topmost", True)
-        #this gives the window time to go to the top, and then resets after
-        root.after(0, lambda: root.attributes("-topmost", False))
-        #var = tk.StringVar(value = "yes")
-        #confirmation_entry = ttk.Entry(root, textvariable = var, width=50, font=("Arial", 12))
-        #confirmation_label = ttk.Label(root, text = f"Clear Data \n(Yes / No)")
+        #creates the widget object and stores in root
+        root = tk.Tk()
+
         #these functions get the width and height of a device screen
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
 
         scaled_widget_width = int(screen_width / 4)
         scaled_widget_height = int(screen_height / 4)
-        screen_middle_width = int(screen_width / 2)
-        screen_middle_height = int(screen_height / 2)
-
         screen_middle_width = (screen_width - scaled_widget_width) // 2
         screen_middle_height = (screen_height - scaled_widget_height) // 2
 
         #order of width * height
         root.geometry(f"{scaled_widget_width}x{scaled_widget_height}+{screen_middle_width}+{screen_middle_height}")
-        tk.Label(root, text = f"Clear {filename}?", font = ("Arial", 20)).pack()
+        #creates a frame widget inside the root window
+        frame = tk.Frame(root)
+        tk.Label(frame, text = f"Clear {filename}?").grid(row = 0, column = 0, columnspan = 2, pady = 20)
         #creates the confirm button object
-        confirm = tk.Button(root, text = "CONFIRM", width = 12, command = prompt_user)
+        confirm = tk.Button(frame, text = "CONFIRM", width = 12, command = prompt_user)
         #packs the confirm button in a window / widget
-        confirm.pack(side = "left", padx = 40)
+        confirm.grid(row = 1, column = 0, padx = 20, pady = 10)
         #root.destroy() immediately closes the window
-        cancel = tk.Button(root, text = "CANCEL", width = 12, command = cancel_action)
-        cancel.pack(side = "right", padx = 40)
+        cancel = tk.Button(frame, text = "CANCEL", width = 12, command = cancel_action)
+        cancel.grid(row = 1, column = 1, padx = 20, pady = 10)
+        frame.place(relx = 0.5, rely = 0.5, anchor = "center")
         #starts an infinite loop for the window/widget object (root) and waits for an event
         root.mainloop()
 

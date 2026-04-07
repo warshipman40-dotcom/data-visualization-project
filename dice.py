@@ -1,3 +1,4 @@
+#individual dice class
 from random import randint
 import pygal
 import matplotlib.pyplot as plt
