@@ -20,6 +20,7 @@ class DiceGameRoll:
     """A class that allows you to roll multiple dice and find product / sum"""
     def __init__(self, dice):
         #stores a list of dice
+        #self basically means that if you call using self, any method in the class can use self methods
         self.dice = dice
         
     #this method of DiceGameRoll will pass in a list of die
@@ -30,6 +31,7 @@ class DiceGameRoll:
         #this will let you combine dice with different sides and examine data
         results = []
         for roll in range(total_rolls):
+            #list comphrenhension
             value = [die.roll() for die in self.dice]
             results.append(value)
         return results
@@ -189,6 +191,8 @@ class DiceGameRoll:
 
         if type == "product":
             x, y = self.get_all_possible_products(), product_frequencies
+            #removes 0s so for very big sums it is not messed up
+            #x, y = zip(*[(v, f) for v, f in zip(x, y) if f > 0])
             plt.xlabel("Product", fontsize = 14)
             scatter = plt.scatter(x, y)
 
@@ -222,6 +226,7 @@ class DiceGameRoll:
             if response:
                 #stores the tuples of theoretical_distribution, (theo_values, and theo_frequencies)
                 theo_values, theo_frequencies = self.get_theoretical_distribution()
+                #theo_values, theo_frequencies = zip(*[(v, f) for v, f in zip(theo_values, theo_frequencies) if f > 0])
                 #stores the length of all rolls into all_rolls
                 all_rolls = len(results)
                 #sets the scaling factor by diving the length of all rolls by the sum of all frequencies
@@ -233,6 +238,7 @@ class DiceGameRoll:
             else:
                 messagebox.showinfo("Theoretical Sums", "Theoretical Sums not added")
             x, y = self.get_all_possible_sums(), sum_frequencies
+            #x, y = zip(*[(v, f) for v, f in zip(x, y) if f > 0])
             #since theoretical distribution returns two results, this can effectively be unpacked            
 
             plt.xlabel("Sum", fontsize = 14)
@@ -478,6 +484,7 @@ class DiceGameRoll:
         #root.destroy() immediately closes the window
         cancel = tk.Button(frame, text = "CANCEL", width = 12, command = cancel_action)
         cancel.grid(row = 1, column = 1, padx = 20, pady = 10)
+        #places it 50% of the parent (Root's) width and length, and is anchored in the center of the screen
         frame.place(relx = 0.5, rely = 0.5, anchor = "center")
         #starts an infinite loop for the window/widget object (root) and waits for an event
         root.mainloop()
