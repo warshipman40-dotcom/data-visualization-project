@@ -55,47 +55,22 @@ class DiceGameRoll:
             sums.append(itemSum)
         return sums
     
-    #to get all possible products, we need to get the number of sides from both dice
-    #then we have to make a nested for loop so that every possibiltiy is multiplied
-    #after that, we have to remove duplicates so the results aren't skewed
     def get_all_possible_products(self):
         """This function allows you to get a list of all possible products given the dice values"""
-        possible_products = [1]
-        #loops through all die in the list self.dice
-        for die in self.dice:
-            #we have to use this to prevent a memory leak so that the list doesn't keep growing at an exponential rate
-            current_products = possible_products.copy()
-            #this will loop over the current products, not the ones we just appended
-            for product in current_products:
-                #this stores the possible range from 1 to total die sides in the variable value
-                for value in range (1, die.num_sides+1):
-                    #this will than append to list and keep getting multiplied
-                    possible_products.append(product * value)
-        #using set will remove duplicates (since set can't contain duplicates, the duplicates will automatically get removed)
-        possible_products = sorted(set(possible_products))
+        #use range(1, die_num_sides + 1) to get the range of sides for each die in the list of dice
+        #this stores all possible ranges in a tuple
+        ranges = [range(1, die.num_sides + 1) for die in self.dice]
+        #*ranges generates all possible combinations of values for the die (*ranges) is necessary to unpack properly
+        #np.prod() will multiply both integers in ranges together and it will then be stored 
+        #{} brackets turns it into a set, which removes duplicates
+        #sorted will sort it from lowest to highest, and will also turn it back into a list
+        possible_products = sorted({np.prod(combination) for combination in product(*ranges)})
         return possible_products
 
     def get_all_possible_sums(self):
         """This function allows you to get a list of all possible sums given the dice sums"""
-        #to get all possible sums, we need to add all possible values between the two pairs of dice
-        #to get all possible values we must use nested for loops
-        #we must start with 0 so the list is actually iterable
-        possible_sums = [0]
-        for die in self.dice:
-            #we use a copy of the list 
-            #current_sums contains all information in possible_sums at the specific moment
-            #it does NOT change when you iterate over it
-            #this helps you safely iterate over both lists and get the possible sum
-            current_sums = possible_sums.copy()
-            #this will erase the old list, getting rid of 0 being one of our possible sums
-            possible_sums = []
-            #values is all the possible values we can get from the sides of both dice so far
-            #we use this loop in the range of current_sums because we need to loop 
-            for sum in current_sums:
-                for values in range(1, die.num_sides+1):
-                    possible_sums.append(values + sum)
-            
-        possible_sums = sorted(set(possible_sums))
+        ranges = [range(1, die.num_sides + 1) for die in self.dice]
+        possible_sums = sorted({sum(combination) for combination in product(*ranges)})
         return possible_sums
 
     def get_frequencies(self, results, type = "sum"):
