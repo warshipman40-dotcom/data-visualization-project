@@ -8,4 +8,4 @@ https://github.com/warshipman40-dotcom/data-visualization-project/releases/tag/d
 Instruction : run the main class (rollclassesdie.py)
 The other classes (dice.py) and (diceroll.py) are classes that help create the dice objects.
 # Video of project here:
-https://youtu.be/503RD8cj6F8
+https://youtu.be/XnGW1AiXuBo
