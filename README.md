@@ -7,3 +7,5 @@ This project was a great way for me to see the multiple libraries that python ha
 https://github.com/warshipman40-dotcom/data-visualization-project/releases/tag/data_visualization_download
 Instruction : run the main class (rollclassesdie.py)
 The other classes (dice.py) and (diceroll.py) are classes that help create the dice objects.
+#Video of project here:
+https://youtu.be/503RD8cj6F8
