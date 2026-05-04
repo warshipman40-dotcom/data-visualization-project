@@ -7,6 +7,20 @@ from tkinter import messagebox
 from PIL import Image
 import json
 import sys
+import os
+
+#added a resource path that takes our relative_path as a param
+def resource_path(relative_path):
+    try:
+        #Pyinstaller Temp folder
+        #if running as an exe uses something like C:\Temp\_MEI12345\dice_gif.gif
+        base_path = sys._MEIPASS  
+    #exception attribute error in the case we don't use pyinstaller and run normally
+    except AttributeError:
+        base_path = "."
+    #for example if running normally will return ./dice_gif.gif
+    return os.path.join(base_path, relative_path)
+
 #this takes in the parameters of file, and lasts for the paramater duration
 def show_gif_then_input(file, duration = 3000):
     #animation method inside of the class
@@ -56,7 +70,8 @@ root = tk.Tk()
 root.title("Menu")
 #this will initially hide the root so the splash can display
 root.withdraw()
-file = "dice_gif.gif"
+file = resource_path("dice_gif.gif")
+#file = "dice_gif.gif"
 #this calls the splash function for 3 seconds and passes in the gif file
 splash = show_gif_then_input(file, duration = 3000)
 #after 3000 seconds, uses an anonymous lambda function to call root.deiconify(), which shows the main root again
@@ -183,10 +198,17 @@ tk.Button(frame, text = "SUBMIT", command = get_values).grid(row = 4, column = 0
 #on button click, lambda (function without name) runs sys.exit()
 #lambda functions are very efficient if they are short functions (e.g one lined)
 #sys.exit() is necessary to stop all execution
-tk.Button(frame, text = "EXIT", command = lambda : sys.exit()).grid(row = 4, column = 1, padx = 10, pady = 10)
+
+def exit_function():
+    messagebox.showinfo("Thank You", "Thank you for using Data Visualization!")
+    sys.exit()
+
+tk.Button(frame, text = "EXIT", command = exit_function).grid(row = 4, column = 1, padx = 10, pady = 10)
 #creates feedback button
 tk.Button(frame, text = "FEEDBACK", command = get_feedback).grid(row = 4, column = 2, padx = 10, pady = 10)
 root.mainloop()
+
+
 
 #die_1 = Die(6)
 #result = die_1.roll_dice(100)
